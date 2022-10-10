@@ -320,7 +320,7 @@ class CornersProblem(search.SearchProblem):
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
+            #   x,y = posicaoAtual
             #   dx, dy = Actions.directionToVector(action)
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
@@ -455,8 +455,11 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
-
+    heuristic = 0
+    foodList = foodGrid.asList()
+    for foodHeuristic in foodList:
+        heuristic = mazeDistance(position, foodHeuristic, problem.startingGameState)
+    return heuristic
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
     def registerInitialState(self, state):
@@ -486,7 +489,27 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        abertos = util.Queue()
+        posicaoAtual = problem.getStartState()
+        # Add a list along with the state to store the list of actions to get to
+        # the posicaoAtual
+        abertos.push((posicaoAtual, []))
+        posVisitadas = [posicaoAtual]
+
+        while not abertos.isEmpty():
+            posicaoAtual, estadoMovimento = abertos.pop()
+            # check if current node is the goal
+            if problem.isGoalState(posicaoAtual):
+                return estadoMovimento
+            estadosVizinhos = problem.getSuccessors(posicaoAtual)
+            #check if the list of estadosVizinhos
+            if estadosVizinhos !=[]:
+                for item in estadosVizinhos:
+                    novoEstado, direction, cost = item
+                    if novoEstado not in posVisitadas:
+                        posVisitadas.append(novoEstado)
+                        abertos.push((novoEstado, estadoMovimento + [direction]))
+        return []
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -522,7 +545,9 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        foodAvailable = self.food
+        return foodAvailable[x][y]
+        #util.raiseNotDefined()
 
 def mazeDistance(point1, point2, gameState):
     """
