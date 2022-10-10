@@ -12,12 +12,10 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and 
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-
 """
 In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
-
 import util
 
 class SearchProblem:
@@ -62,22 +60,21 @@ class SearchProblem:
         """
         util.raiseNotDefined()
 
-
 def tinyMazeSearch(problem):
     """
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
     sequence of moves will be incorrect, so only use this for tinyMaze.
     """
-    from game import direcaos
-    s = direcaos.SOUTH
-    w = direcaos.WEST
+    from game import Directions
+    s = Directions.SOUTH
+    w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
 
-    Your search algorithm needs to return a list of caminhos that reaches the
+    Your search algorithm needs to return a list of actions that reaches the
     goal. Make sure to implement a graph search algorithm.
 
     To get started, you might want to try some of these simple commands to
@@ -88,7 +85,6 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    """"""
     no = {'estado':problem.getStartState(),'cost':0}
     if problem.isGoalState(no['estado']):
         return []
@@ -141,25 +137,21 @@ def breadthFirstSearch(problem):
                     acao.reverse()
                     return acao
                 abertos.push(child)
+
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     abertos = util.PriorityQueue()
     abertos.push((problem.getStartState(), [], 0), 0)
     fechados = []
-
     while not abertos.isEmpty():
         filho, caminhos, valor = abertos.pop()
-
         if(not filho in fechados):
             fechados.append(filho)
-
             if problem.isGoalState(filho):
                 return caminhos
-
             for child, direcao, heurisValue in problem.getSuccessors(filho):
                 abertos.push((child, caminhos+[direcao], valor + heurisValue), valor + heurisValue)
-
     return []
 
 def nullHeuristic(state, problem=None):
@@ -175,7 +167,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     abertos = util.PriorityQueue()
     abertos.push( (problem.getStartState(), [], 0), heuristic(problem.getStartState(), problem) )
     fechados = []
-
     while not abertos.isEmpty():
         filhos, caminhos, valor = abertos.pop()
         if(not filhos in fechados):
@@ -186,7 +177,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 g = valor + heurisValue
                 abertos.push((child, caminhos+[direcao], valor + heurisValue), g + heuristic(child, problem))
     return []
-
 
 # Abbreviations
 bfs = breadthFirstSearch
