@@ -453,13 +453,48 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
+   position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    heuristic = 0
-    foodList = foodGrid.asList()
-    for foodHeuristic in foodList:
-        heuristic = mazeDistance(position, foodHeuristic, problem.startingGameState)
-    return heuristic
+    if(problem.isGoalState(state)):
+        return 0
+    verticesINMST = set()
+    verticesNOTMST = set()
+    
+    for i, item in enumerate(foodGrid):
+        for j, foodItem in enumerate(item):
+            if(foodItem):
+                verticesNOTMST.add((i,j))
+    closest_dist = min([util.manhattanDistance(position, item) for item in verticesNOTMST])
+    
+    # verticesNOTMST.add(position)
+    edges = util.PriorityQueue()
+    
+    cost = 0
+    # edges.push((verticesNOTMST[i], verticesNOTMST[j]), util.manhattanDistance(verticesNOTMST[i], verticesNOTMST[j]))
+    poppedEdge = None
+    inV, outV = 0,0
+    spanCost = closest_dist
+    spanEdges = []
+    
+    currentVert = verticesNOTMST.pop()
+    verticesINMST.add(currentVert)
+    
+    while len(verticesNOTMST) != 0:
+        for vert in verticesNOTMST:
+            cost = util.manhattanDistance(currentVert, vert)
+            edges.push(((currentVert, vert), cost), cost)
+        while(True):
+            poppedEdge, cost = edges.pop()
+            if(poppedEdge[1] in verticesNOTMST):
+                inV, outV = poppedEdge
+                break
+        spanCost += cost
+        verticesNOTMST.remove(outV)
+        verticesINMST.add(outV)
+        spanEdges.append((poppedEdge, cost))
+        currentVert = outV
+    # print "pos:", position, " h:", spanCost    
+    return spanCost
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
     def registerInitialState(self, state):
