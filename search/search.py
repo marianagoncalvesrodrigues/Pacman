@@ -145,7 +145,23 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.PriorityQueue()
+    fringe.push( (problem.getStartState(), [], 0), 0 )
+    expanded = []
+
+    while not fringe.isEmpty():
+        node, actions, curCost = fringe.pop()
+
+        if(not node in expanded):
+            expanded.append(node)
+
+            if problem.isGoalState(node):
+                return actions
+
+            for child, direction, cost in problem.getSuccessors(node):
+                fringe.push((child, actions+[direction], curCost + cost), curCost + cost)
+
+    return []
 
 def nullHeuristic(state, problem=None):
     """
@@ -157,7 +173,24 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.PriorityQueue()
+    fringe.push( (problem.getStartState(), [], 0), heuristic(problem.getStartState(), problem) )
+    expanded = []
+
+    while not fringe.isEmpty():
+        node, actions, curCost = fringe.pop()
+
+        if(not node in expanded):
+            expanded.append(node)
+
+            if problem.isGoalState(node):
+                return actions
+
+            for child, direction, cost in problem.getSuccessors(node):
+                g = curCost + cost
+                fringe.push((child, actions+[direction], curCost + cost), g + heuristic(child, problem))
+
+    return []
 
 
 # Abbreviations
