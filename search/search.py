@@ -19,7 +19,6 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
-from util import Queue
 
 class SearchProblem:
     """
@@ -54,11 +53,11 @@ class SearchProblem:
         """
         util.raiseNotDefined()
 
-    def getCostOfActions(self, actions):
+    def getCostOfcaminhos(self, caminhos):
         """
-         actions: A list of actions to take
+         caminhos: A list of caminhos to take
 
-        This method returns the total cost of a particular sequence of actions.
+        This method returns the total cost of a particular sequence of caminhos.
         The sequence must be composed of legal moves.
         """
         util.raiseNotDefined()
@@ -69,16 +68,16 @@ def tinyMazeSearch(problem):
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
     sequence of moves will be incorrect, so only use this for tinyMaze.
     """
-    from game import Directions
-    s = Directions.SOUTH
-    w = Directions.WEST
+    from game import direcaos
+    s = direcaos.SOUTH
+    w = direcaos.WEST
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
 
-    Your search algorithm needs to return a list of actions that reaches the
+    Your search algorithm needs to return a list of caminhos that reaches the
     goal. Make sure to implement a graph search algorithm.
 
     To get started, you might want to try some of these simple commands to
@@ -145,21 +144,21 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    fringe = util.PriorityQueue()
-    fringe.push( (problem.getStartState(), [], 0), 0 )
-    expanded = []
+    abertos = util.PriorityQueue()
+    abertos.push((problem.getStartState(), [], 0), 0)
+    fechados = []
 
-    while not fringe.isEmpty():
-        node, actions, curCost = fringe.pop()
+    while not abertos.isEmpty():
+        filho, caminhos, valor = abertos.pop()
 
-        if(not node in expanded):
-            expanded.append(node)
+        if(not filho in fechados):
+            fechados.append(filho)
 
-            if problem.isGoalState(node):
-                return actions
+            if problem.isGoalState(filho):
+                return caminhos
 
-            for child, direction, cost in problem.getSuccessors(node):
-                fringe.push((child, actions+[direction], curCost + cost), curCost + cost)
+            for child, direcao, heurisValue in problem.getSuccessors(filho):
+                abertos.push((child, caminhos+[direcao], valor + heurisValue), valor + heurisValue)
 
     return []
 
@@ -173,23 +172,19 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    fringe = util.PriorityQueue()
-    fringe.push( (problem.getStartState(), [], 0), heuristic(problem.getStartState(), problem) )
-    expanded = []
+    abertos = util.PriorityQueue()
+    abertos.push( (problem.getStartState(), [], 0), heuristic(problem.getStartState(), problem) )
+    fechados = []
 
-    while not fringe.isEmpty():
-        node, actions, curCost = fringe.pop()
-
-        if(not node in expanded):
-            expanded.append(node)
-
-            if problem.isGoalState(node):
-                return actions
-
-            for child, direction, cost in problem.getSuccessors(node):
-                g = curCost + cost
-                fringe.push((child, actions+[direction], curCost + cost), g + heuristic(child, problem))
-
+    while not abertos.isEmpty():
+        filhos, caminhos, valor = abertos.pop()
+        if(not filhos in fechados):
+            fechados.append(filhos)
+            if problem.isGoalState(filhos):
+                return caminhos
+            for child, direcao, heurisValue in problem.getSuccessors(filhos):
+                g = valor + heurisValue
+                abertos.push((child, caminhos+[direcao], valor + heurisValue), g + heuristic(child, problem))
     return []
 
 
