@@ -311,12 +311,12 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         #util.raiseNotDefined()
-        node = state[0]
+        no = state[0]
         cantosVisitados = state[1]
 
-        if node in self.corners:
-            if node not in cantosVisitados:
-                cantosVisitados.append(node)
+        if no in self.corners:
+            if no not in cantosVisitados:
+                cantosVisitados.append(no)
                 print(cantosVisitados)
             return len(cantosVisitados) == 4 #se visitar os quatro cantos retorna true
         return False
@@ -331,9 +331,8 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-        i = True
-        successors = []
-        for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+        filhos = []
+        for acao in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
             #   x,y = posicaoAtual
@@ -343,22 +342,22 @@ class CornersProblem(search.SearchProblem):
 
             "*** YOUR CODE HERE ***"
             x,y = state[0]
-            visitedCorners = state[1]
-            dx, dy = Actions.directionToVector(action)
-            nextx, nexty = int(x + dx), int(y + dy)
-            hitsWall = self.walls[nextx][nexty]
+            cantosVisitados = state[1]
+            dx, dy = Actions.directionToVector(acao)
+            proxX, proxY = int(x + dx), int(y + dy)
+            hitsWall = self.walls[proxX][proxY]
             if not hitsWall:
-                next_state = (nextx, nexty)
-                successVisitedCorners = list(visitedCorners)
-                if next_state in self.corners:
-                    corner_state = next_state
-                    if corner_state not in successVisitedCorners:
-                        successVisitedCorners.append(corner_state)
-                child = ((next_state, successVisitedCorners), action, 1)
-                successors.append(child)
+                proximo_estado = (proxX, proxY)
+                cantosVisitadosOk = list(cantosVisitados)
+                if proximo_estado in self.corners:
+                    corner_state = proximo_estado
+                    if corner_state not in cantosVisitadosOk:
+                        cantosVisitadosOk.append(corner_state)
+                filho = ((proximo_estado, cantosVisitadosOk), acao, 1)
+                filhos.append(filho)
 
         self._expanded += 1 # DO NOT CHANGE
-        return successors
+        return filhos
 
     def getCostOfActions(self, actions):
         """
@@ -367,13 +366,13 @@ class CornersProblem(search.SearchProblem):
         """
         if actions == None: return 999999
         x,y= self.startingPosition
-        cost = 0
+        custo = 0
 
         for action in actions:
             dx, dy = Actions.directionToVector(action)
             x, y = int(x + dx), int(y + dy)
             if self.walls[x][y]: return 999999
-            cost += self.costFn(x,y)
+            custo += self.costFn(x,y)
         return len(actions)
 
 
@@ -394,20 +393,20 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    node = state[0]
-    visitedCorners = state[1]
-    cornersToVisit = []
-    for corner in corners:
-        if corner not in visitedCorners:
-            cornersToVisit.append(corner)
+    no = state[0]
+    cantosVisitados = state[1]
+    cantosPVisitar = []
+    for canto in corners:
+        if canto not in cantosVisitados:
+            cantosPVisitar.append(canto)
 
-    if len(cornersToVisit) == 0:
+    if len(cantosPVisitar) == 0:
         return 0
 
     manhatten = []
-    for n in cornersToVisit:
-        manhatten.append(util.manhattanDistance(n, node))
-        cornersToVisit.remove(n)
+    for n in cantosPVisitar:
+        manhatten.append(util.manhattanDistance(n, no))
+        cantosPVisitar.remove(n)
     return min(manhatten)
 
 class AStarCornersAgent(SearchAgent):
@@ -500,48 +499,40 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
+    posicao, comida = state
     "*** YOUR CODE HERE ***"
     if(problem.isGoalState(state)):
         return 0
     verticesINMST = set()
     verticesNOTMST = set()
 
-    for i, item in enumerate(foodGrid):
+    for i, item in enumerate(comida):
         for j, foodItem in enumerate(item):
             if(foodItem):
                 verticesNOTMST.add((i,j))
-    closest_dist = min([util.manhattanDistance(position, item) for item in verticesNOTMST])
-
-    # verticesNOTMST.add(position)
-    edges = util.PriorityQueue()
-
-    cost = 0
-    # edges.push((verticesNOTMST[i], verticesNOTMST[j]), util.manhattanDistance(verticesNOTMST[i], verticesNOTMST[j]))
-    poppedEdge = None
-    inV, outV = 0,0
-    spanCost = closest_dist
-    spanEdges = []
-
-    currentVert = verticesNOTMST.pop()
-    verticesINMST.add(currentVert)
+    distMin = min([util.manhattanDistance(posicao, item) for item in verticesNOTMST])
+    arestas = util.PriorityQueue()
+    spanCusto = distMin
+    spanArestas = []
+    atualVert = verticesNOTMST.pop()
+    verticesINMST.add(atualVert)
 
     while len(verticesNOTMST) != 0:
         for vert in verticesNOTMST:
-            cost = util.manhattanDistance(currentVert, vert)
-            edges.push(((currentVert, vert), cost), cost)
+            custo = util.manhattanDistance(atualVert, vert)
+            arestas.push(((atualVert, vert), custo), custo)
         while(True):
-            poppedEdge, cost = edges.pop()
-            if(poppedEdge[1] in verticesNOTMST):
-                inV, outV = poppedEdge
+            popBorda, custo = arestas.pop()
+            if(popBorda[1] in verticesNOTMST):
+                inV, outV = popBorda
                 break
-        spanCost += cost
+        spanCusto += custo
         verticesNOTMST.remove(outV)
         verticesINMST.add(outV)
-        spanEdges.append((poppedEdge, cost))
-        currentVert = outV
-    # print "pos:", position, " h:", spanCost
-    return spanCost
+        spanArestas.append((popBorda, custo))
+        atualVert = outV
+    return spanArestas
+
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
     def registerInitialState(self, state):
