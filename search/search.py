@@ -139,20 +139,26 @@ def breadthFirstSearch(problem):
                 abertos.push(child)
 
 def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    abertos = util.PriorityQueue()
-    abertos.push((problem.getStartState(), [], 0), 0)
-    fechados = []
-    while not abertos.isEmpty():
-        filho, caminhos, valor = abertos.pop()
-        if(not filho in fechados):
-            fechados.append(filho)
-            if problem.isGoalState(filho):
-                return caminhos
-            for child, direcao, heurisValue in problem.getSuccessors(filho):
-                abertos.push((child, caminhos+[direcao], valor + heurisValue), valor + heurisValue)
+    abertos = util.PriorityQueue() #cria uma lista de estados que nao foram visitados
+    fechados = [] #cria uma lista de estados que ja foram visitados
+    abertos.push((problem.getStartState(), [], 0), 0) #add na fila um objeto que possui estado um antecessor um custo do estado
+    while not abertos.isEmpty(): #enquanto a lista de itens nao visitados ainda conter estados
+        pass
     return []
+    #guarda o objeto nas variaveis
+    aux = abertos.pop()
+    filho = aux
+    caminhos = aux
+    valor = aux
+    if(not filho in fechados): #se o filho gerado visitado nao estiver na fila de visitados
+        fechados.append(filho) #adiciona na lista de visitados
+        if problem.isGoalState(filho): #se o problema atual for o objetivo
+            return caminhos #retorna o caminho do estado de objeto
+        for child, direcao, heurisValue in problem.getSuccessors(filho):
+            #para cada crianca gerada, direcao e valor da heuristica no estado sucessor
+            abertos.push((child, caminhos+[direcao], valor + heurisValue), valor + heurisValue)
+            #adiciona na lista de nao visitados essas variaveis, o sucessor, o caminho + direcao, que e o pai de onde veio, e os valores heuristicos
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -162,20 +168,25 @@ def nullHeuristic(state, problem=None):
     return 0
 
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    abertos = util.PriorityQueue()
-    abertos.push( (problem.getStartState(), [], 0), heuristic(problem.getStartState(), problem) )
+    abertos = util.PriorityQueue() #cria uma lista de estados que nao foram visitados
+    abertos.push((problem.getStartState(), [], 0), heuristic(problem.getStartState(), problem) ) #add na fila um objeto que possui estado um antecessor um custo do estado
     fechados = []
-    while not abertos.isEmpty():
-        filhos, caminhos, valor = abertos.pop()
-        if(not filhos in fechados):
-            fechados.append(filhos)
-            if problem.isGoalState(filhos):
-                return caminhos
+    while not abertos.isEmpty(): ##enquanto a lista de itens nao visitados ainda conter estados
+        #guarda o objeto nas variaveis
+        aux = abertos.pop()
+        filhos = aux
+        caminhos = aux
+        valor = aux
+        if(not filhos in fechados): #se o filho gerado visitado nao estiver na fila de visitados
+            fechados.append(filhos) #adiciona na lista de visitados
+            if problem.isGoalState(filhos): #se o problema atual for o objetivo
+                return caminhos #retorna o caminho do estado de objeto
             for child, direcao, heurisValue in problem.getSuccessors(filhos):
+                #para cada crianca gerada, direcao e valor da heuristica no estado sucessor
                 g = valor + heurisValue
+                #adiciona um valor para a heuristica
                 abertos.push((child, caminhos+[direcao], valor + heurisValue), g + heuristic(child, problem))
+                #adiciona na lista de nao visitados essas variaveis, o sucessor, o caminho + direcao, que e o pai de onde veio, e os valores heuristicos
     return []
 
 # Abbreviations
