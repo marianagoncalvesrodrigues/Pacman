@@ -70,72 +70,57 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-def depthFirstSearch(problem):
-    """
-    Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
-    """
-    "*** YOUR CODE HERE ***"
-    no = {'estado':problem.getStartState(),'cost':0}
-    if problem.isGoalState(no['estado']):
+def depthFirstSearch(problem):  """"DFS"""
+    
+    no = {'estado':problem.getStartState(),'cost':0}  """Recebe o lugar onde nasce o pacman"""
+    if problem.isGoalState(no['estado']): """Verifica se já está no destino"""
         return []
     abertos = []
-    abertos.append(no)
+    abertos.append(no) """"Adiciona o no inicial em abertos"""
     fechados = set()
     while True:
-        if not abertos:
+        if not abertos: 
             raise Exception('falha na busca')
-        no = abertos.pop()
-        fechados.add(no['estado'])
-        filhos = problem.getSuccessors(no['estado'])
-        for filho in filhos:
-            child = {'estado':filho[0],'acao':filho[1],'custo':filho[2],'pai':no}
-            if child['estado']not in fechados:
-                if problem.isGoalState(child['estado']):
+        no = abertos.pop() """"Retiramos o no de abertos"""
+        fechados.add(no['estado']) 
+        filhos = problem.getSuccessors(no['estado']) """"Buscamos todos os filhos desse nó"""
+        for filho in filhos: """"Verificamos filho a filho encontrado"""
+            child = {'estado':filho[0],'acao':filho[1],'custo':filho[2],'pai':no} """"Definimos um dicionario filho para que possamos comparar e encontrar o caminho"""
+            if child['estado']not in fechados:  """"Verificação para caso o filho não esteja em fechados"""
+                if problem.isGoalState(child['estado']): """"Verificação para caso o filho que está sendo avaliado seja o objetivo"""
                     acao = []
                     no = child
-                    while 'pai' in no:
+                    while 'pai' in no: """"Encontrando caminho feito a partir dos pais"""
                         acao.append(no['acao'])
                         no = no['pai']
-                    acao.reverse()
-                    return acao
+                    acao.reverse() """"Inverte o array"""
+                    return acao """"Retorna o caminho"""
                 abertos.insert(0,child)
 
-def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    no = {'estado':problem.getStartState(),'cost':0}
-    if problem.isGoalState(no['estado']):
+def breadthFirstSearch(problem): """"BFS"""
+    no = {'estado':problem.getStartState(),'cost':0} """Recebe o lugar onde nasce o pacman"""
+    if problem.isGoalState(no['estado']): """Verifica se já está no destino"""
         return []
-    abertos = util.Queue()
-    abertos.push(no)
+    abertos = util.Queue() 
+    abertos.push(no) """"Adiciona o no inicial em abertos"""
     fechados = set()
     while True:
-        if abertos.isEmpty():
+        if abertos.isEmpty():  """"caso não aja mais caminhos a explorar retorna erro"""
             raise Exception('falha na busca')
-        no = abertos.pop()
-        fechados.add(no['estado'])
-        filhos = problem.getSuccessors(no['estado'])
-        for filho in filhos:
-            child = {'estado':filho[0],'acao':filho[1],'custo':filho[2],'pai':no}
-            if child['estado']not in fechados:
-                if problem.isGoalState(child['estado']):
+        no = abertos.pop()  """"Retiramos o no de abertos"""
+        fechados.add(no['estado'])   
+        filhos = problem.getSuccessors(no['estado'])  """"Buscamos todos os filhos desse nó"""
+        for filho in filhos:  """"Verificamos filho a filho encontrado"""
+            child = {'estado':filho[0],'acao':filho[1],'custo':filho[2],'pai':no} """"Definimos um dicionario filho para que possamos comparar e encontrar o caminho"""
+            if child['estado']not in fechados:  """"Verificação para caso o filho não esteja em fechados"""
+                if problem.isGoalState(child['estado']):  """"Verificação para caso o filho que está sendo avaliado seja o objetivo"""
                     acao = []
                     no = child
-                    while 'pai' in no:
+                    while 'pai' in no: """"Encontrando caminho feito a partir dos pais"""
                         acao.append(no['acao'])
                         no = no['pai']
-                    acao.reverse()
-                    return acao
+                    acao.reverse() """"Inverte o array"""
+                    return acao """"Retorna o caminho"""
                 abertos.push(child)
 
 def uniformCostSearch(problem):
