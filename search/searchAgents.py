@@ -1,14 +1,15 @@
 # searchAgents.py
 # ---------------
-# Licensing Information:  You are free to use or extend these projects for
-# educational purposes provided that (1) you do not distribute or publish
-# solutions, (2) you retain this notice, and (3) you provide clear
-# attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-#
+# Licensing Information:  You are free to use or extend these projects for 
+# educational purposes provided that (1) you do not distribute or publish 
+# solutions, (2) you retain this notice, and (3) you provide clear 
+# attribution to UC Berkeley, including a link to 
+# http://inst.eecs.berkeley.edu/~cs188/pacman/pacman.html
+# 
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
-# The core projects and autograders were primarily created by John DeNero
+# The core projects and autograders were primarily created by John DeNero 
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# Student side autograding was added by Brad Miller, Nick Hay, and
+# Student side autograding was added by Brad Miller, Nick Hay, and 
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
@@ -40,7 +41,6 @@ from game import Actions
 import util
 import time
 import search
-import copy
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -295,13 +295,15 @@ class CornersProblem(search.SearchProblem):
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        return (self.startingPosition, ())
+        "*** YOUR CODE HERE ***"
+        util.raiseNotDefined()
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        return set(state[1]) == set(self.corners)
+        "*** YOUR CODE HERE ***"
+        util.raiseNotDefined()
 
     def getSuccessors(self, state):
         """
@@ -313,6 +315,7 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
+
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
@@ -322,19 +325,7 @@ class CornersProblem(search.SearchProblem):
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
 
-            x, y = state[0]
-            dx, dy = Actions.directionToVector(action)
-            nextx, nexty = int(x + dx), int(y + dy)
-            hitsWall = self.walls[nextx][nexty]
-
-            if not hitsWall:
-                succ_pos = (nextx, nexty)
-                succ_corner = list(state[1])
-
-                if succ_pos in self.corners and succ_pos not in state[1]:
-                    succ_corner.append(succ_pos)
-
-                successors.append(((succ_pos, tuple(succ_corner)), action, 1))
+            "*** YOUR CODE HERE ***"
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -352,6 +343,7 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
+
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -362,33 +354,14 @@ def cornersHeuristic(state, problem):
       problem: The CornersProblem instance for this layout.
 
     This function should always return a number that is a lower bound on the
-    shortest path from the state to a goal of the problem; i.e., it should be
-    admissible.
+    shortest path from the state to a goal of the problem; i.e.  it should be
+    admissible (as well as consistent).
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    heuristic = 0
-    prev_pos = state[0]
-
-    unvisited_corners = list(set(corners) - set(state[1]))
-
-    while unvisited_corners:
-        closest_corner = unvisited_corners[0]
-        closest_corner_distance = util.manhattanDistance(prev_pos, closest_corner)
-
-        for corner in unvisited_corners[1:]:
-            distance = util.manhattanDistance(prev_pos, corner)
-
-            if distance < closest_corner_distance:
-                closest_corner_distance = distance
-                closest_corner = corner
-
-        heuristic += closest_corner_distance
-        unvisited_corners.remove(closest_corner)
-        prev_pos = closest_corner
-
-    return heuristic
+    "*** YOUR CODE HERE ***"
+    return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -453,13 +426,16 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchType = FoodSearchProblem
 
 def foodHeuristic(state, problem):
-    """Your heuristic for the FoodSearchProblem goes here.
+    """
+    Your heuristic for the FoodSearchProblem goes here.
 
-    This heuristic must be admissible to ensure correctness.
+    This heuristic must be consistent to ensure correctness.  First, try to come
+    up with an admissible heuristic; almost all admissible heuristics will be
+    consistent as well.
 
-    If using A* ever finds a solution that is worse uniform cost
-    search finds, your heuristic is *not* admissible!  On the other
-    hand, inadmissible heuristics may occasionally find optimal
+    If using A* ever finds a solution that is worse uniform cost search finds,
+    your heuristic is *not* consistent, and probably not admissible!  On the
+    other hand, inadmissible or inconsistent heuristics may find optimal
     solutions, so be careful.
 
     The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
@@ -476,64 +452,10 @@ def foodHeuristic(state, problem):
     value, try: problem.heuristicInfo['wallCount'] = problem.walls.count()
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
-
     """
-    def find(parent, i):
-        if parent[i] == None:
-            return i
-        return find(parent, parent[i])
-
-    def union(parent, rank, x, y):
-        xroot = find(parent, x)
-        yroot = find(parent, y)
-
-        if rank[xroot] < rank[yroot]:
-            parent[xroot] = yroot
-        elif rank[xroot] > rank[yroot]:
-            parent[yroot] = xroot
-        else :
-            parent[yroot] = xroot
-            rank[xroot] += 1
-
     position, foodGrid = state
-    unvisited_foods = foodGrid.asList()
-
-    if not unvisited_foods:
-        return 0
-
-    graph = []
-    for i in range(len(unvisited_foods)):
-        for j in range(1, len(unvisited_foods)):
-            graph.append([unvisited_foods[i], unvisited_foods[j], util.manhattanDistance(unvisited_foods[i], unvisited_foods[j])])
-
-    mst_length = 0
-    i = 0
-    e = 0
-
-    graph = sorted(graph, key=lambda x:x[2])
-
-    parent = {}
-    rank = {}
-
-    for food in unvisited_foods:
-        parent[food] = None
-        rank[food] = 0
-
-    while e < len(unvisited_foods) - 1:
-        u, v, w = graph[i]
-        i += 1
-        x = find(parent, u)
-        y = find(parent, v)
-
-        if x != y:
-            e += 1
-            mst_length += w
-            union(parent, rank, x, y)
-
-    closest_food = min([util.manhattanDistance(position, food) for food in unvisited_foods])
-
-    return closest_food + mst_length
-
+    "*** YOUR CODE HERE ***"
+    return 0
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -563,7 +485,8 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        return search.uniformCostSearch(problem)
+        "*** YOUR CODE HERE ***"
+        util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -596,7 +519,10 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         The state is Pacman's position. Fill this in with a goal test that will
         complete the problem definition.
         """
-        return state in self.food.asList()
+        x,y = state
+
+        "*** YOUR CODE HERE ***"
+        util.raiseNotDefined()
 
 def mazeDistance(point1, point2, gameState):
     """
